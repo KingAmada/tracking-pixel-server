@@ -1,6 +1,9 @@
 {
-  "name": "email-tracker",
+  "name": "tracking-pixel-server",
   "version": "1.0.0",
   "main": "api/track.js",
-  "dependencies": {}
+  "license": "MIT",
+  "dependencies": {
+    "googleapis": "^112.0.0"
+  }
 }
