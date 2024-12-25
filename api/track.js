@@ -9,9 +9,13 @@ const credentials = JSON.parse(
 
 const SCOPES = ["https://www.googleapis.com/auth/spreadsheets"];
 const auth = new google.auth.GoogleAuth({
-    credentials,
-    scopes: SCOPES,
+    credentials: {
+        client_email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
+        private_key: process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, "\n"),
+    },
+    scopes: ["https://www.googleapis.com/auth/spreadsheets"],
 });
+
 
 // Google Sheets configuration
 const SHEET_ID = "1KbJxNpUHvjEzgmEzthfw2VAUFvWTAYgMiq50pDezMbs"; // Replace with your actual sheet ID
