@@ -1,13 +1,5 @@
 import { google } from "googleapis";
-import { readFileSync } from "fs";
-import { join } from "path";
 
-// Load service account credentials
-const credentials = JSON.parse(
-    readFileSync(join(process.cwd(), "credentials.json"), "utf-8")
-);
-
-const SCOPES = ["https://www.googleapis.com/auth/spreadsheets"];
 const auth = new google.auth.GoogleAuth({
     credentials: {
         client_email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
@@ -16,34 +8,29 @@ const auth = new google.auth.GoogleAuth({
     scopes: ["https://www.googleapis.com/auth/spreadsheets"],
 });
 
-
-// Google Sheets configuration
-const SHEET_ID = "1KbJxNpUHvjEzgmEzthfw2VAUFvWTAYgMiq50pDezMbs"; // Replace with your actual sheet ID
-const RANGE = "Sheet2!A:D"; // Replace with your target range (e.g., A to D columns)
+const SHEET_ID = "1KbJxNpUHvjEzgmEzthfw2VAUFvWTAYgMiq50pDezMbs"; // Replace with your actual Sheet ID
+const RANGE = "Sheet2!A:D"; // Example: Add data to columns A through D
 
 export default async function handler(req, res) {
     const { email } = req.query || "unknown";
-    const userAgent = req.headers["user-agent"];
-    const ip = req.headers["x-forwarded-for"] || req.connection.remoteAddress;
     const timestamp = new Date().toISOString();
 
     try {
-        // Authenticate and connect to Google Sheets
         const sheets = google.sheets({ version: "v4", auth });
-        
-        // Append data to the sheet
+
+        // Append data to the Google Sheet
         await sheets.spreadsheets.values.append({
             spreadsheetId: SHEET_ID,
             range: RANGE,
             valueInputOption: "USER_ENTERED",
             requestBody: {
-                values: [[email, userAgent, ip, timestamp]],
+                values: [[email, timestamp]],
             },
         });
 
         console.log(`Logged email open for: ${email}`);
 
-        // Respond with a tracking pixel
+        // Return a 1x1 tracking pixel
         res.setHeader("Content-Type", "image/gif");
         const pixel = Buffer.from("R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==", "base64");
         res.status(200).send(pixel);
@@ -52,3 +39,4 @@ export default async function handler(req, res) {
         res.status(500).send("Error logging to Google Sheets");
     }
 }
+
